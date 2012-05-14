@@ -52,6 +52,7 @@ class Server {
         $this->bootstrap($args['boostrap']);
         $this->initSocket($args['port']);
 
+        $this->greet();
         $this->serve();
 
         $this->closeSocket();
@@ -82,6 +83,39 @@ class Server {
     private function initSocket($port) {
         $this->socket = new Socket();
         $this->socket->bind($port);
+    }
+
+    /**
+     * Main loop, processing input
+     *
+     */
+    private function serve() {
+        while (true) {
+            $input = $this->socket->read();
+            $command = Command::decode($input);
+            if ($command->isBye()) {
+                break;
+            }
+            $response = $command->execute();
+            $this->socket->write(Response::encode($response));
+        }
+    }
+
+    /**
+     * Close binded socket
+     *
+     */
+    private function closeSocket() {
+        $this->socket->close();
+    }
+
+    /**
+     * Print slim protocol version
+     *
+     */
+    private function greet() {
+        $greet = new Response\Greet();
+        $this->socket->write(Response::encode($greet));
     }
 
 }
