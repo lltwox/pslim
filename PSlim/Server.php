@@ -2,7 +2,12 @@
 namespace PSlim;
 
 /**
- * Server class, initializes all resources and connects logic
+ * Slim server implementation.
+ *
+ * For details about slim protocol, see
+ * http://fitnesse.org/FitNesse.UserGuide.SliM.SlimProtocol
+ *
+ * Class initializes all resources and connects logic
  *
  * @author lex
  *
@@ -29,10 +34,20 @@ class Server {
     }
 
     /**
-     * Process input arguments of t
+     * Process input arguments of the command line
+     *
+     * @return array
      */
     private static function processInputArgs() {
+        $result = array(
+            'port' => 0,
+            'bootstrap' => '',
+        );
 
+        $args = $_SERVER['argv'];
+        $result['port'] = array_pop($args);
+
+        return $result;
     }
 
     /**
@@ -49,13 +64,11 @@ class Server {
      * @param array $args
      */
     private function start($args) {
-        $this->bootstrap($args['boostrap']);
+        $this->bootstrap($args['bootstrap']);
         $this->initSocket($args['port']);
 
         $this->greet();
         $this->serve();
-
-        $this->closeSocket();
     }
 
     /**
@@ -91,22 +104,15 @@ class Server {
      */
     private function serve() {
         while (true) {
-            $input = $this->socket->read();
-            $command = Command::decode($input);
-            if ($command->isBye()) {
-                break;
-            }
-            $response = $command->execute();
-            $this->socket->write(Response::encode($response));
+            $input = $this->readCommand();
+//             echo $input . "\n";
+//             $command = Command::decode($input);
+//             if ($command->isBye()) {
+//                 break;
+//             }
+//             $response = $command->execute();
+//             $this->writeResponse($response);
         }
-    }
-
-    /**
-     * Close binded socket
-     *
-     */
-    private function closeSocket() {
-        $this->socket->close();
     }
 
     /**
@@ -114,8 +120,26 @@ class Server {
      *
      */
     private function greet() {
-        $greet = new Response\Greet();
-        $this->socket->write(Response::encode($greet));
+//         $greet = new Response\Greet();
+        // greeting is sent without length encoding
+//         $this->socket->write($greet);
+        $this->socket->write('Slim -- V0.3' . "\n");
+    }
+
+    /**
+     * Read command from FitNesse server.
+     * As specified in protocol, every command is preceeded with lendth value
+     * in bytes of a command, that follows. Command is seperated from length
+     * with a colon. E.g.:
+     *       000035:[000002:000005:hello:000005:world:] , where:
+     * length^     ^colon            ^ command
+     *
+     */
+    private function readCommand() {
+        $commandLength = $this->socket->read(6);
+        // skipping colon
+        $this->socket->read(1);
+        return $this->socket->read($commandLength);
     }
 
 }

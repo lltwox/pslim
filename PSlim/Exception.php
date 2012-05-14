@@ -7,6 +7,6 @@ namespace PSlim;
  * @author lex
  *
  */
-class Exception {
+class Exception extends \Exception {
 
 }
