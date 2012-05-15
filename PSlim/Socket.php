@@ -69,7 +69,6 @@ class Socket {
      * @param string $data
      */
     public function write($data) {
-        echo "Write: " . $data . "\n";
         $result = socket_write($this->communicationSocket, $data);
         $this->checkResult($result);
     }
@@ -165,7 +164,6 @@ class Socket {
      * @param integer $length
      */
     private function readData($length) {
-        echo "Read: " . $length . "bytes\n";
         $result = '';
         while ($length > 0) {
             $bytesToRead = self::CHUNK_SIZE < $length
@@ -174,8 +172,6 @@ class Socket {
             $result .= socket_read($this->communicationSocket, $bytesToRead);
             $length -= self::CHUNK_SIZE;
         }
-
-        echo $result . "\n";
 
         return $result;
     }

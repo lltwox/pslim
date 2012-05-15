@@ -29,7 +29,9 @@ class Server {
         try {
             $server->start($args);
         } catch (Exception $e) {
-            echo $e->getMessage();
+            echo 'Internal PSlim error: ' . $e->getMessage() . "\n";
+            echo 'Stack trace: ' . "\n";
+            echo $e->getTraceAsString();
         }
     }
 
@@ -104,13 +106,12 @@ class Server {
      */
     private function serve() {
         while (true) {
-            $input = $this->readCommand();
-//             echo $input . "\n";
-//             $command = Command::decode($input);
-//             if ($command->isBye()) {
-//                 break;
-//             }
-//             $response = $command->execute();
+            $input = $this->readInstructions();
+            if ($input == Instruction::BYE) {
+                break;
+            }
+            $instructionsList = Instruction::decode($input);
+//             $response = $instructionsList->execute();
 //             $this->writeResponse($response);
         }
     }
@@ -120,26 +121,23 @@ class Server {
      *
      */
     private function greet() {
-//         $greet = new Response\Greet();
-        // greeting is sent without length encoding
-//         $this->socket->write($greet);
-        $this->socket->write('Slim -- V0.3' . "\n");
+        $this->socket->write(Response::GREET);
     }
 
     /**
-     * Read command from FitNesse server.
-     * As specified in protocol, every command is preceeded with lendth value
-     * in bytes of a command, that follows. Command is seperated from length
-     * with a colon. E.g.:
+     * Read list of instructions from FitNesse server.
+     *
+     * As specified in protocol, every list is preceeded with lendth in bytes.
+     * List is seperated from length value with a colon. E.g.:
      *       000035:[000002:000005:hello:000005:world:] , where:
-     * length^     ^colon            ^ command
+     * length^     ^colon            ^ list of instructions
      *
      */
-    private function readCommand() {
-        $commandLength = $this->socket->read(6);
+    private function readInstructions() {
+        $length = $this->socket->read(6);
         // skipping colon
         $this->socket->read(1);
-        return $this->socket->read($commandLength);
+        return $this->socket->read($length);
     }
 
 }
