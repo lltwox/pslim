@@ -15,6 +15,19 @@ namespace PSlim;
 class Server {
 
     /**
+     * Version of the slim protocol
+     *
+     */
+    const VERSION = '0.3';
+
+    /**
+     * Socket object, used for communication with FitNesse
+     *
+     * @var Socket
+     */
+    private $socket = null;
+
+    /**
      * Run server
      *
      */
@@ -110,9 +123,16 @@ class Server {
             if ($input == Instruction::BYE) {
                 break;
             }
-            $instructionsList = Instruction::decode($input);
-//             $response = $instructionsList->execute();
-//             $this->writeResponse($response);
+
+            echo "Read:  " . $input . "\n";
+
+            $instructionsList = new InstructionList($input);
+            $responseList = $instructionsList->execute();
+
+            $response = $responseList->encode();
+            echo "Write: " . $response . "\n";
+
+            $this->writeResponse($response);
         }
     }
 
@@ -121,7 +141,7 @@ class Server {
      *
      */
     private function greet() {
-        $this->socket->write(Response::GREET);
+        $this->socket->write('Slim -- V' . self::VERSION . "\n");
     }
 
     /**
@@ -138,6 +158,25 @@ class Server {
         // skipping colon
         $this->socket->read(1);
         return $this->socket->read($length);
+    }
+
+    /**
+     * Write response for FitNesse server.
+     * Encoded the same way as input commands: <length in bytes>:<string>.
+     *
+     * @param string $response
+     */
+    private function writeResponse($response) {
+        $responseLength = strlen($response);
+        $this->socket->write(sprintf('%06d:%s', $responseLength, $response));
+    }
+
+    /**
+     * Print help message
+     *
+     */
+    private static function printHelp() {
+        echo 'Help';
     }
 
 }

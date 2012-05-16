@@ -1,11 +1,13 @@
 <?php
 namespace PSlim;
 
-use PSlim\Instruction\Item ;
-use PSlim\Instruction\Decoder;
-use PSlim\Instruction\Collection;
-
-class Instruction {
+/**
+ * Class, representing an instruction object, that can be executed
+ *
+ * @author lex
+ *
+ */
+abstract class Instruction {
 
     /**
      * String from server, that indicates, that slim server can shut down
@@ -14,29 +16,59 @@ class Instruction {
     const BYE = 'bye';
 
     /**
-     * Decode input to get list of instructions
+     * Id of the instruction
      *
-     * @param string $input
-     * @return Instruction\Collection
+     * @var string
      */
-    public static function decode($input) {
-        $collection = new Collection();
-        $decoder = new Decoder();
-        $elements = $decoder->decode($input);
-        foreach ($elements as $element) {
-            $collection->add(self::create($element));
-        }
+    private $id = null;
 
-        return $collection;
+    /**
+     * Create appropriate instruction object
+     *
+     * @param array $params - decoded array
+     */
+    public static function create(array $params) {
+        $id = array_shift($params);
+        $type = array_shift($params);
+
+        $classname = self::getInstructionClassname($type);
+
+        return new $classname($id, $params);
     }
 
     /**
-     * Create appropriate instruction
+     * Get a appropriate classname for instruction of given type
      *
-     * @param array $items
+     * @param string $type
+     * @return string
      */
-    public static function create(array $items) {
-
+    private static function getInstructionClassname($type) {
+        return 'PSlim\\Instruction\\' . ucfirst($type);
     }
+
+    /**
+     * Constructor
+     *
+     * @param string $id - instruction id
+     */
+    protected function __construct($id) {
+        $this->id = $id;
+    }
+
+    /**
+     * Get id of the instruction
+     *
+     * @return string
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * Execute command and get response
+     *
+     * @return Response
+     */
+    abstract public function execute();
 
 }
