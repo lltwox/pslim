@@ -80,6 +80,7 @@ class Server {
      */
     private function start($args) {
         $this->bootstrap($args['bootstrap']);
+        $this->initResources();
         $this->initSocket($args['port']);
 
         $this->greet();
@@ -104,6 +105,14 @@ class Server {
     }
 
     /**
+     * Init server resources
+     *
+     */
+    private function initResources() {
+        mb_internal_encoding("UTF-8");
+    }
+
+    /**
      * Init socket object
      *
      * @param integer $port
@@ -124,14 +133,10 @@ class Server {
                 break;
             }
 
-            echo "Read:  " . $input . "\n";
-
             $instructionsList = new InstructionList($input);
             $responseList = $instructionsList->execute();
 
             $response = $responseList->encode();
-            echo "Write: " . $response . "\n";
-
             $this->writeResponse($response);
         }
     }

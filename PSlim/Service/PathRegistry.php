@@ -26,7 +26,7 @@ class PathRegistry {
      */
     public function add($path) {
         $nameParser = ServiceLocator::getNameParser();
-        $parsedPath = $nameParser->parse();
+        $parsedPath = $nameParser->parse($path);
 
         // paths, that were imported later are more important
         array_unshift($this->paths, $parsedPath);
