@@ -162,6 +162,7 @@ class Server {
         $length = $this->socket->read(6);
         // skipping colon
         $this->socket->read(1);
+
         return $this->socket->read($length);
     }
 

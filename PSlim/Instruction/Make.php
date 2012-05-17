@@ -4,6 +4,7 @@ namespace PSlim\Instruction;
 use PSlim\ServiceLocator;
 use PSlim\Instruction;
 use PSlim\Response\Ok;
+use PSlim\Response\Error;
 
 class Make extends Instruction {
 

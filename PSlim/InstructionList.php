@@ -1,7 +1,10 @@
 <?php
 namespace PSlim;
 
+
 use PSlim\LengthFormat\Decoder;
+use PSlim\Instruction;
+use PSlim\Response;
 
 /**
  * Class, representing list of instructions.
@@ -47,7 +50,7 @@ class InstructionList {
         $responseList = new ResponseList();
         /* @var $instruction Instruction */
         foreach ($this->instructions as $instruction) {
-            $response = $instruction->execute();
+            $response = $this->executeInstruction($instruction);
             $responseList->add($response);
         }
 
@@ -63,6 +66,34 @@ class InstructionList {
     private function getArrayOfElements($input) {
         $decoder = new Decoder();
         return $decoder->decode($input);
+    }
+
+    /**
+     * Execute one instruction
+     *
+     * @param Instruction $instruction
+     * @return Response
+     */
+    private function executeInstruction(Instruction $instruction) {
+        try {
+            $response = $instruction->execute();
+        } catch (StandardException $e) {
+            $response = new Response\StandardException(
+                $instruction->getId(), $e
+            );
+        } catch (Exception $e) {
+            if ($this->isStopTestException($e)) {
+                $response = new Response\StopTestException(
+                    $instruction->getId(), $e
+                );
+            } else {
+                $response = new Response\UserException(
+                    $instruction->getId(), $e
+                );
+            }
+        }
+
+        return $response;
     }
 
 }
