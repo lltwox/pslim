@@ -16,6 +16,6 @@ class NoMethodInClass extends StandardException {
      *
      * @var string
      */
-    protected $exceptionTag = 'COULD_NOT_INVOKE_CONSTRUCTOR';
+    protected $exceptionTag = 'NO_METHOD_IN_CLASS';
 
 }

@@ -17,6 +17,6 @@ class NoInstance extends StandardException {
      *
      * @var string
      */
-    protected $exceptionTag = 'NO_CLASS';
+    protected $exceptionTag = 'NO_INSTANCE';
 
 }

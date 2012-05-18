@@ -3,8 +3,6 @@ namespace PSlim\Service;
 
 use PSlim\ServiceLocatorUser;
 
-use PSlim\Service;
-
 /**
  * Path registry implementation.
  * A container for all imported paths.
@@ -35,12 +33,24 @@ class PathRegistry extends ServiceLocatorUser {
     }
 
     /**
-     * Get list of imported paths
+     * Get list of possible class names, taking into account all imported paths
      *
      * @return array
      */
-    public function getPaths() {
-        return $this->paths;
+    public function getClassNamesFor($className) {
+        $result = array();
+        $nameParser = $this->getServiceLocator()->getNameParser();
+        $paths = $this->paths;
+
+        $result[] = $nameParser->parse($className);
+        foreach ($paths as $path) {
+            $result[]
+                = $path . $nameParser->getImplodeSymbol()
+                . $nameParser->parse($className)
+            ;
+        }
+
+        return $result;
     }
 
     /**

@@ -1,13 +1,11 @@
 <?php
 namespace PSlim;
 
-use PSlim\StandardException\StopSuiteException;
-
-use PSlim\StandardException\StopTestException;
-
 use PSlim\LengthFormat\Decoder;
 use PSlim\Instruction;
 use PSlim\Response;
+use PSlim\StandardException\StopTestException;
+use PSlim\StandardException\StopSuiteException;
 
 /**
  * Class, representing list of instructions.
@@ -45,6 +43,7 @@ class InstructionList extends ServiceLocatorUser {
      */
     public function __construct($input) {
         $elements = $this->getArrayOfElements($input);
+
         foreach ($elements as $element) {
             $this->add(Instruction::create($element));
         }
@@ -138,10 +137,10 @@ class InstructionList extends ServiceLocatorUser {
     /**
      * Check if this is a stop test exception
      *
-     * @param Exception $e
+     * @param \Exception $e
      * @return boolean
      */
-    private function isStopTestException(Exception $e) {
+    private function isStopTestException(\Exception $e) {
         $exceptionClass = get_class($e);
 
         return
@@ -153,10 +152,10 @@ class InstructionList extends ServiceLocatorUser {
     /**
      * Check if this is a stop suite exception
      *
-     * @param Exception $e
+     * @param \Exception $e
      * @return boolean
      */
-    private function isStopSuiteException(Exception $e) {
+    private function isStopSuiteException(\Exception $e) {
         $exceptionClass = get_class($e);
         return (strpos($exceptionClass, 'StopSuite') !== false);
     }

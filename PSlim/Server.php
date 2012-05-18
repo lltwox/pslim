@@ -36,6 +36,7 @@ class Server {
             $args = self::processInputArgs();
         } catch (Exception $e) {
             self::printHelp();
+            return;
         }
 
         $server = new Server();
@@ -60,6 +61,13 @@ class Server {
         );
 
         $args = $_SERVER['argv'];
+        $count = $_SERVER['argc'];
+        if ($count > 2) {
+            if ($args[1] == '-b' || $args[1] == '--bootstrap') {
+                $result['bootstrap'] = $args[2];
+            }
+        }
+
         $result['port'] = array_pop($args);
 
         return $result;

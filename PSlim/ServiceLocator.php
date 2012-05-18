@@ -4,6 +4,7 @@ namespace PSlim;
 use PSlim\Exception;
 use PSlim\Service\PathRegistry;
 use PSlim\Service\NameParser;
+use PSlim\Service\InstanceStorage;
 
 /**
  * Service locator pattern implementation.
@@ -34,6 +35,20 @@ class ServiceLocator {
      * @var NameParser
      */
     private $nameParser = null;
+
+    /**
+     * Storage, for instances, created with make instruction
+     *
+     * @var InstanceStorage
+     */
+    private $instanceStorage = null;
+
+    /**
+     * Storage, for symbol values, created with callAndAssign instruction
+     *
+     * @var SymbolStorage
+     */
+    private $symbolStorage = null;
 
     /**
      * Init instance of service locator.
@@ -104,6 +119,52 @@ class ServiceLocator {
      */
     public function setNameParser(NameParser $nameParser) {
         $this->nameParser = $nameParser;
+    }
+
+    /**
+     * Get instance storage object, that can store named objects.
+     * Used for storing objects, created with make instruction.
+     *
+     * @return InstanceStorage
+     */
+    public function getInstanceStorage() {
+        if (null == $this->instanceStorage) {
+            $this->instanceStorage = new InstanceStorage();
+        }
+
+        return $this->instanceStorage;
+    }
+
+    /**
+     * Set instance storage object
+     *
+     * @param InstanceStorage $instanceStorage
+     */
+    public function setInstanceStorage(InstanceStorage $instanceStorage) {
+        $this->instanceStorage = $instanceStorage;
+    }
+
+    /**
+     * Get symbol storage object, that can store named values.
+     * Used for storing values, created with callAndAssign instruction.
+     *
+     * @return SymbolStorage
+     */
+    public function getSymbolStorage() {
+        if (null == $this->symbolStorage) {
+            $this->symbolStorage = new SymbolStorage();
+        }
+
+        return $this->symbolStorage;
+    }
+
+    /**
+     * Set symbol storage object
+     *
+     * @param SymbolStorage $symbolStorage
+     */
+    public function setSymbolStorage(SymbolStorage $symbolStorage) {
+        $this->symbolStorage = $symbolStorage;
     }
 
 }

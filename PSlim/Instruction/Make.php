@@ -1,10 +1,11 @@
 <?php
 namespace PSlim\Instruction;
 
-use PSlim\ServiceLocator;
 use PSlim\Instruction;
 use PSlim\Response\Ok;
 use PSlim\Response\Error;
+use PSlim\StandardException\NoClass;
+use PSlim\StandardException\CouldNotInvokeConstructor;
 
 /**
  * Class for execution of FitNesse make instruction
@@ -19,7 +20,7 @@ class Make extends Instruction {
      *
      * @var string
      */
-    private $instance = null;
+    private $instanceName = null;
 
     /**
      * Name of the class to create
@@ -44,10 +45,8 @@ class Make extends Instruction {
     public function __construct($id, $params) {
         parent::__construct($id);
 
-        $this->instance = self::extractFirstParam($params);
-        $this->className = $this->parseClassName(
-            self::extractFirstParam($params)
-        );
+        $this->instanceName = self::extractFirstParam($params);
+        $this->className = self::extractFirstParam($params);
         $this->args = $params;
     }
 
@@ -57,22 +56,25 @@ class Make extends Instruction {
      * @return Response
      */
     public function execute() {
-//         $className = $this->getFullyQualifiedClassName();
-//         $instance = $this->createObject($className);
-//         $this->storeInstance($instance);
+        $this->removeStoredInstance();
+
+        $className = $this->getFullyQualifiedClassName();
+        $object = $this->createObject($className);
+        $this->storeObject($object);
 
         return new Ok($this->getId());
     }
 
     /**
-     * Parse classname to convert it to currently selected php notation
+     * Try to delete instance with current name from instance storage.
      *
-     * @param string $name
-     * @return string
+     * FitNesse is not very creative about making instance's names, so
+     * if one class is not created, all methods may be called on class from
+     * previous table.
      */
-    private function parseClassName($name) {
-        $nameParser = $this->getServiceLocator()->getNameParser();
-        return $nameParser->parse($name);
+    private function removeStoredInstance() {
+        $storage = $this->getServiceLocator()->getInstanceStorage();
+        $storage->remove($this->instanceName);
     }
 
     /**
@@ -80,13 +82,44 @@ class Make extends Instruction {
      *
      * @return string
      */
-    private function getFulltQualifiedName() {
-        if (class_exists($this->className)) {
-            return $this->className;
+    private function getFullyQualifiedClassName() {
+        $pathRegisry = $this->getServiceLocator()->getPathRegistry();
+        $classNames = $pathRegisry->getClassNamesFor($this->className);
+
+        foreach ($classNames as $className) {
+            if (class_exists($className)) {
+                return $className;
+            }
         }
 
-        $pathRegisry = ServiceLocator::getPathRegistry();
-        $paths = $pathRegisry->getPaths();
+        throw new NoClass($this->className);
+    }
+
+    /**
+     * Create object for given class, using instruction's params
+     *
+     * @param string $className
+     * @return object
+     */
+    private function createObject($className) {
+        $reflectionClass = new \ReflectionClass($className);
+        try {
+            $instance = $reflectionClass->newInstanceArgs($this->args);
+        } catch (\ReflectionException $e) {
+            throw new CouldNotInvokeConstructor($this->className);
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Store created object under instance name in registry
+     *
+     * @param object $instance
+     */
+    private function storeObject($object) {
+        $storage = $this->getServiceLocator()->getInstanceStorage();
+        $storage->store($this->instanceName, $object);
     }
 
 }

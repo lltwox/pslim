@@ -4,7 +4,7 @@ namespace PSlim\Service;
 use PSlim\ServiceLocatorUser;
 
 /**
- * Name parser interface.
+ * Name parser abstract class.
  *
  * Name parser is a class, that can convert name of the path or class name
  * from notation, how it was specified in FitNesse test, to a one of php
@@ -20,7 +20,7 @@ abstract class NameParser extends ServiceLocatorUser {
      *
      * @var string
      */
-    protected $implodeSymbol = null;
+    protected $implodeSymbol = '';
 
     /**
      * Parse name from FitNesse location to php

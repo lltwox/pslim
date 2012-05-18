@@ -12,7 +12,7 @@ use PSlim\Exception;
  * @author lex
  *
  */
-abstract class StandardException extends Exception {
+class StandardException extends Exception {
 
     /**
      * One of standard exception tags

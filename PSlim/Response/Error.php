@@ -13,18 +13,18 @@ use PSlim\StandardException\StopTestException;
  * @author lex
  *
  */
-abstract class Error extends Response {
+class Error extends Response {
 
     /**
      * Standard exception tag
      *
      */
-    const EXCEPTION_TAG = '__EXCEPTION__';
+    const EXCEPTION_TAG = '__EXCEPTION__:';
 
     /**
-     * Exception, to show
+     * Error, to show
      *
-     * @var \Exception
+     * @var \Error
      */
     private $exception = null;
 
@@ -32,7 +32,7 @@ abstract class Error extends Response {
      * Consturctor
      *
      * @param string $id
-     * @param Exception $e
+     * @param Error $e
      */
     public function __construct($id, \Exception $e) {
         parent::__construct($id);

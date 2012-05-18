@@ -12,12 +12,6 @@ use PSlim\Service\NameParser;
 class GracefulNames extends NameParser {
 
     /**
-     * Symbol, used to implode parts of paths and classes
-     *
-     */
-    protected $implodeSymbol= '';
-
-    /**
      * Parse name from FitNesse location to php
      *
      * @param string $name

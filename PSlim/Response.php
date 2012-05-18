@@ -31,7 +31,9 @@ abstract class Response {
      * @return array
      */
     public function getData() {
-        return array($this->id, $this->getResponseData());
+        $data = $this->getResponseData();
+//         echo "Response data: " . $data . "\n";
+        return array($this->id, $data);
     }
 
     /**

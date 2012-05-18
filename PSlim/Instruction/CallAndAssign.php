@@ -4,7 +4,20 @@ namespace PSlim\Instruction;
 use PSlim\Instruction;
 use PSlim\Response\Value;
 
-class CallAndAssign extends Instruction {
+/**
+ * Class for execution of FitNesse callAndAssign instruction
+ *
+ * @author lex
+ *
+ */
+class CallAndAssign extends Call {
+
+    /**
+     * Symbol name to store a value under
+     *
+     * @var string
+     */
+    private $symbolName = null;
 
     /**
      * Constructor
@@ -13,7 +26,8 @@ class CallAndAssign extends Instruction {
      * @param array $params
      */
     public function __construct($id, $params) {
-        parent::__construct($id);
+        $this->symbolName = self::extractFirstParam($params);
+        parent::__construct($id, $params);
     }
 
     /**
@@ -22,7 +36,21 @@ class CallAndAssign extends Instruction {
      * @return Response
      */
     public function execute() {
-        return new Value($this->getId(), 0);
+        $result = $this->callMethod();
+        $this->storeSymbolValue($result);
+
+        // TODO: convert value to string
+        return new Value($this->getId(), $result);
+    }
+
+    /**
+     * Store symbol value
+     *
+     * @param string $value
+     */
+    private function storeSymbolValue($value) {
+        $storage = $this->getServiceLocator()->getSymbolStorage();
+        $storage->store($this->symbolName, $value);
     }
 
 }
