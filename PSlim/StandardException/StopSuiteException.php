@@ -12,12 +12,15 @@ use PSlim\StandardException\StopTestException;
 class StopSuiteException extends StopTestException {
 
     /**
-     * Get exception message
+     * Construct an exception
      *
-     * @return string
+     * @param string $message
+     * @param int $code
+     * @param \Exception $previous
      */
-    public function getMessage() {
-        return 'Test didn\'t run due to previous errors';
+    public function __construct($message = null, $code = 0, $previous = null) {
+        $message = 'Test didn\'t run due to previous errors';
+        parent::__construct($message, $code, $previous);
     }
 
 }

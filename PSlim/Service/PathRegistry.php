@@ -2,7 +2,8 @@
 namespace PSlim\Service;
 
 use PSlim\ServiceLocatorUser;
-use PSlim\ServiceLocator;
+
+use PSlim\Service;
 
 /**
  * Path registry implementation.
@@ -26,7 +27,7 @@ class PathRegistry extends ServiceLocatorUser {
      * @param string $path
      */
     public function add($path) {
-        $nameParser = ServiceLocator::getNameParser();
+        $nameParser = $this->getServiceLocator()->getNameParser();
         $parsedPath = $nameParser->parse($path);
 
         // paths, that were imported later are more important

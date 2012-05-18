@@ -1,6 +1,7 @@
 <?php
 namespace PSlim;
 
+use PSlim\Exception;
 use PSlim\Service\PathRegistry;
 use PSlim\Service\NameParser;
 
@@ -12,6 +13,13 @@ use PSlim\Service\NameParser;
  *
  */
 class ServiceLocator {
+
+    /**
+     * One instance of service locator, that can be created.
+     *
+     * @var ServiceLocator
+     */
+    private static $instance = null;
 
     /**
      * Instance of path registry object
@@ -26,6 +34,30 @@ class ServiceLocator {
      * @var NameParser
      */
     private $nameParser = null;
+
+    /**
+     * Init instance of service locator.
+     *
+     * This ensures, that only one instance of service locator can be created
+     * and it will be created by PSlim in the begging.
+     */
+    public static function initInstance() {
+        if (null !== self::$instance) {
+            throw new Exception(
+                'Only one instance of ServiceLocator can be created'
+            );
+        }
+
+        self::$instance = new ServiceLocator();
+        ServiceLocatorUser::setServiceLocator(self::$instance);
+    }
+
+    /**
+     * Private constructor to enforce use of initialization method
+     *
+     */
+    private function __construct() {
+    }
 
     /**
      * Get path registry, containing all imported paths

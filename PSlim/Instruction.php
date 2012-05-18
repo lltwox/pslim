@@ -33,9 +33,7 @@ abstract class Instruction extends ServiceLocatorUser {
      * @param ServiceLocator $serviceLocator - instance of service locator to be
      *        used by instructions
      */
-    public static function create(
-        array $params, ServiceLocator $serviceLocator
-    ) {
+    public static function create(array $params) {
         $id = self::extractFirstParam($params);
         $type = self::extractFirstParam($params);
 
@@ -43,7 +41,6 @@ abstract class Instruction extends ServiceLocatorUser {
 
         /* @var $instance Instruction */
         $instance = new $classname($id, $params);
-        $instance->setServiceLocator($serviceLocator);
 
         return $instance;
     }

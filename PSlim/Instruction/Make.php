@@ -6,6 +6,12 @@ use PSlim\Instruction;
 use PSlim\Response\Ok;
 use PSlim\Response\Error;
 
+/**
+ * Class for execution of FitNesse make instruction
+ *
+ * @author lex
+ *
+ */
 class Make extends Instruction {
 
     /**

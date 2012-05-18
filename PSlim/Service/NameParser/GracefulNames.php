@@ -9,7 +9,7 @@ use PSlim\Service\NameParser;
  * @author lex
  *
  */
-class GracefulNames implements NameParser {
+class GracefulNames extends NameParser {
 
     /**
      * Symbol, used to implode parts of paths and classes
@@ -28,15 +28,6 @@ class GracefulNames implements NameParser {
         $parts = array_map('ucfirst', $parts);
 
         return implode($this->implodeSymbol, $parts);
-    }
-
-    /**
-     * Get symbol to implode classname to pathname
-     *
-     * @return string
-     */
-    public function getImplodeSymbol() {
-        return $this->implodeSymbol;
     }
 
 }

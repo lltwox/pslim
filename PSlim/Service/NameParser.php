@@ -1,6 +1,8 @@
 <?php
 namespace PSlim\Service;
 
+use PSlim\ServiceLocatorUser;
+
 /**
  * Name parser interface.
  *
@@ -11,7 +13,14 @@ namespace PSlim\Service;
  * @author lex
  *
  */
-interface NameParser {
+abstract class NameParser extends ServiceLocatorUser {
+
+    /**
+     * Symbol, used to implode parts of paths and classes
+     *
+     * @var string
+     */
+    protected $implodeSymbol = null;
 
     /**
      * Parse name from FitNesse location to php
@@ -19,13 +28,15 @@ interface NameParser {
      * @param string $name
      * @return string
      */
-    public function parse($name);
+    abstract public function parse($name);
 
     /**
      * Get symbol to implode classname to pathname
      *
      * @return string
      */
-    public function getImplodeSymbol();
+    public function getImplodeSymbol() {
+        return $this->implodeSymbol;
+    }
 
 }

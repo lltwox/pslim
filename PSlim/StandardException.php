@@ -29,7 +29,7 @@ abstract class StandardException extends Exception {
      * @param \Exception $previous
      */
     public function __construct($message = null, $code = 0, $previous = null) {
-        $message = trim($this->$exceptionTag . ' ' . $message);
+        $message = trim($this->exceptionTag . ' ' . $message);
         parent::__construct($message, $code, $previous);
     }
 

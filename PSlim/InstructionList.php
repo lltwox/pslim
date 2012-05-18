@@ -1,7 +1,6 @@
 <?php
 namespace PSlim;
 
-
 use PSlim\StandardException\StopSuiteException;
 
 use PSlim\StandardException\StopTestException;
@@ -16,7 +15,21 @@ use PSlim\Response;
  * @author lex
  *
  */
-class InstructionList {
+class InstructionList extends ServiceLocatorUser {
+
+    /**
+     * Flag, used by instructions list, showing if suite was aborted
+     *
+     * @boolean
+     */
+    private static $suiteAborted = false;
+
+    /**
+     * Flag, showing if current set of instructions was aborted
+     *
+     * @var boolean
+     */
+    private $testAborted = false;
 
     /**
      * Internal array with instructions
@@ -29,13 +42,11 @@ class InstructionList {
      * Constructor
      *
      * @param string $input - input from FitNesse, length encoded
-     * @param ServiceLocator $serviceLocator - instance of ServiceLocator class,
-     *        tuned for current execution, required by instruction objects
      */
-    public function __construct($input, ServiceLocator $serviceLocator) {
+    public function __construct($input) {
         $elements = $this->getArrayOfElements($input);
         foreach ($elements as $element) {
-            $this->add(Instruction::create($element, $serviceLocator));
+            $this->add(Instruction::create($element));
         }
     }
 
