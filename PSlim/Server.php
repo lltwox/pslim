@@ -28,6 +28,13 @@ class Server {
     private $socket = null;
 
     /**
+     * Service locator instance
+     *
+     * @var ServiceLocator
+     */
+    private $serviceLocator = null;
+
+    /**
      * Run server
      *
      */
@@ -109,6 +116,7 @@ class Server {
      *
      */
     private function initResources() {
+        $this->serviceLocator = new ServiceLocator();
         mb_internal_encoding("UTF-8");
     }
 
@@ -133,7 +141,9 @@ class Server {
                 break;
             }
 
-            $instructionsList = new InstructionList($input);
+            $instructionsList = new InstructionList(
+                $input, $this->serviceLocator
+            );
             $responseList = $instructionsList->execute();
 
             $response = $responseList->encode();

@@ -2,7 +2,7 @@
 namespace PSlim;
 
 /**
- * Basic exceotion, thrown by PSlim operations
+ * Basic exception, thrown by PSlim operations
  *
  * @author lex
  *

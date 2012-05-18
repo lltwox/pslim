@@ -37,8 +37,11 @@ class Make extends Instruction {
      */
     public function __construct($id, $params) {
         parent::__construct($id);
-        $this->instance = array_shift($params);
-        $this->className = $this->parseClassName(array_shift($params));
+
+        $this->instance = self::extractFirstParam($params);
+        $this->className = $this->parseClassName(
+            self::extractFirstParam($params)
+        );
         $this->args = $params;
     }
 
@@ -62,7 +65,7 @@ class Make extends Instruction {
      * @return string
      */
     private function parseClassName($name) {
-        $nameParser = ServiceLocator::getNameParser();
+        $nameParser = $this->getServiceLocator()->getNameParser();
         return $nameParser->parse($name);
     }
 

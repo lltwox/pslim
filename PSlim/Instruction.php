@@ -1,13 +1,17 @@
 <?php
 namespace PSlim;
 
+use PSlim\StandardException\MalformedInstruction;
+
+use PSlim\StandardException;
+
 /**
  * Class, representing an instruction object, that can be executed
  *
  * @author lex
  *
  */
-abstract class Instruction {
+abstract class Instruction extends ServiceLocatorUser {
 
     /**
      * String from server, that indicates, that slim server can shut down
@@ -26,14 +30,22 @@ abstract class Instruction {
      * Create appropriate instruction object
      *
      * @param array $params - decoded array
+     * @param ServiceLocator $serviceLocator - instance of service locator to be
+     *        used by instructions
      */
-    public static function create(array $params) {
-        $id = array_shift($params);
-        $type = array_shift($params);
+    public static function create(
+        array $params, ServiceLocator $serviceLocator
+    ) {
+        $id = self::extractFirstParam($params);
+        $type = self::extractFirstParam($params);
 
         $classname = self::getInstructionClassname($type);
 
-        return new $classname($id, $params);
+        /* @var $instance Instruction */
+        $instance = new $classname($id, $params);
+        $instance->setServiceLocator($serviceLocator);
+
+        return $instance;
     }
 
     /**
@@ -70,5 +82,19 @@ abstract class Instruction {
      * @return Response
      */
     abstract public function execute();
+
+    /**
+     * Wrapper for array_shift to handle errors
+     *
+     * @param array &$input - array will be modified the same if array_shift is
+     *        called on it
+     */
+    protected static function extractFirstParam(array &$input) {
+        if (empty($input)) {
+            throw new StandardException\MalformedInstruction();
+        }
+
+        return array_shift($input);
+    }
 
 }

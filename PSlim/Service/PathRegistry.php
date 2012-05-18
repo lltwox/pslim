@@ -1,6 +1,7 @@
 <?php
 namespace PSlim\Service;
 
+use PSlim\ServiceLocatorUser;
 use PSlim\ServiceLocator;
 
 /**
@@ -10,7 +11,7 @@ use PSlim\ServiceLocator;
  * @author lex
  *
  */
-class PathRegistry {
+class PathRegistry extends ServiceLocatorUser {
 
     /**
      * List of imported paths

@@ -2,6 +2,10 @@
 namespace PSlim;
 
 
+use PSlim\StandardException\StopSuiteException;
+
+use PSlim\StandardException\StopTestException;
+
 use PSlim\LengthFormat\Decoder;
 use PSlim\Instruction;
 use PSlim\Response;
@@ -25,11 +29,13 @@ class InstructionList {
      * Constructor
      *
      * @param string $input - input from FitNesse, length encoded
+     * @param ServiceLocator $serviceLocator - instance of ServiceLocator class,
+     *        tuned for current execution, required by instruction objects
      */
-    public function __construct($input) {
+    public function __construct($input, ServiceLocator $serviceLocator) {
         $elements = $this->getArrayOfElements($input);
         foreach ($elements as $element) {
-            $this->add(Instruction::create($element));
+            $this->add(Instruction::create($element, $serviceLocator));
         }
     }
 
@@ -47,9 +53,17 @@ class InstructionList {
      *
      */
     public function execute() {
+        if (self::$suiteAborted) {
+            return $this->getSuiteAbortedResponse();
+        }
+
         $responseList = new ResponseList();
         /* @var $instruction Instruction */
         foreach ($this->instructions as $instruction) {
+            if ($this->testAborted) {
+                break;
+            }
+
             $response = $this->executeInstruction($instruction);
             $responseList->add($response);
         }
@@ -69,6 +83,23 @@ class InstructionList {
     }
 
     /**
+     * Get response object, that suite has been aborted
+     *
+     * @return Response\SuiteAbortedException
+     */
+    private function getSuiteAbortedResponse() {
+        if (empty($this->instructions)) {
+            return new ResponseList();
+        }
+        $firstInstruction = array_shift($this->instructions);
+        $response = new Response\Error(
+            $firstInstruction->getId(), new StopSuiteException()
+        );
+
+        return new ResponseList(array($response));
+    }
+
+    /**
      * Execute one instruction
      *
      * @param Instruction $instruction
@@ -77,23 +108,46 @@ class InstructionList {
     private function executeInstruction(Instruction $instruction) {
         try {
             $response = $instruction->execute();
-        } catch (StandardException $e) {
-            $response = new Response\StandardException(
-                $instruction->getId(), $e
-            );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if ($this->isStopTestException($e)) {
-                $response = new Response\StopTestException(
-                    $instruction->getId(), $e
-                );
-            } else {
-                $response = new Response\UserException(
-                    $instruction->getId(), $e
-                );
+                $this->testAborted = true;
+                if ($this->isStopSuiteException($e)) {
+                    self::$suiteAborted = true;
+                }
+
+                $e = new StopTestException($e->getMessage());
             }
+
+            $response = new Response\Error($instruction->getId(), $e);
         }
 
         return $response;
+    }
+
+    /**
+     * Check if this is a stop test exception
+     *
+     * @param Exception $e
+     * @return boolean
+     */
+    private function isStopTestException(Exception $e) {
+        $exceptionClass = get_class($e);
+
+        return
+            (strpos($exceptionClass, 'StopTest') !== false)
+            || $this->isStopSuiteException($e)
+        ;
+    }
+
+    /**
+     * Check if this is a stop suite exception
+     *
+     * @param Exception $e
+     * @return boolean
+     */
+    private function isStopSuiteException(Exception $e) {
+        $exceptionClass = get_class($e);
+        return (strpos($exceptionClass, 'StopSuite') !== false);
     }
 
 }

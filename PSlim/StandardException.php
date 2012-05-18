@@ -22,12 +22,15 @@ abstract class StandardException extends Exception {
     protected $exceptionTag = null;
 
     /**
-     * Get exception message
+     * Construct an exception
      *
-     * @return string
+     * @param string $message
+     * @param int $code
+     * @param \Exception $previous
      */
-    public function getMessage() {
-        return $this->$exceptionTag . ' ' . $this->message;
+    public function __construct($message = null, $code = 0, $previous = null) {
+        $message = trim($this->$exceptionTag . ' ' . $message);
+        parent::__construct($message, $code, $previous);
     }
 
 }

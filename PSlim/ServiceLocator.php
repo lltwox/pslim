@@ -18,26 +18,26 @@ class ServiceLocator {
      *
      * @var PathRegistry
      */
-    private static $pathRegistry = null;
+    private $pathRegistry = null;
 
     /**
      * Instance of name parser object
      *
      * @var NameParser
      */
-    private static $nameParser = null;
+    private $nameParser = null;
 
     /**
      * Get path registry, containing all imported paths
      *
-     * @return \PSlim\Service\PathRegistry
+     * @return PathRegistry
      */
-    public static function getPathRegistry() {
-        if (null == self::$pathRegistry) {
-            self::$pathRegistry = new PathRegistry();
+    public function getPathRegistry() {
+        if (null == $this->pathRegistry) {
+            $this->setPathRegistry(new PathRegistry());
         }
 
-        return self::$pathRegistry;
+        return $this->pathRegistry;
     }
 
     /**
@@ -45,8 +45,9 @@ class ServiceLocator {
      *
      * @param PathRegistry $registry
      */
-    public static function setPathRegistry(PathRegistry $registry) {
-        self::$pathRegistry = $registry;
+    public function setPathRegistry(PathRegistry $registry) {
+        $this->pathRegistry = $registry;
+        $this->pathRegistry->setServiceLocator($this);
     }
 
     /**
@@ -54,14 +55,14 @@ class ServiceLocator {
      * in FitNesse notation to currently selected php notation.
      * By default PEAR notation is selected.
      *
-     * @return \PSlim\Service\NameParser
+     * @return NameParser
      */
-    public static function getNameParser() {
-        if (null == self::$nameParser) {
-            self::$nameParser = new NameParser\Pear();
+    public function getNameParser() {
+        if (null == $this->nameParser) {
+            $this->nameParser = new NameParser\Pear();
         }
 
-        return self::$nameParser;
+        return $this->nameParser;
     }
 
     /**
@@ -69,8 +70,8 @@ class ServiceLocator {
      *
      * @param NameParser $nameParser
      */
-    public static function setNameParser(NameParser $nameParser) {
-        self::$nameParser = $nameParser;
+    public function setNameParser(NameParser $nameParser) {
+        $this->nameParser = $nameParser;
     }
 
 }

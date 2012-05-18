@@ -37,9 +37,7 @@ class Import extends Instruction {
      * @return Response
      */
     public function execute() {
-        $pathRegistry = ServiceLocator::getPathRegistry();
-        $pathRegistry->add($this->path);
-
+        $this->getServiceLocator()->getPathRegistry()->add($this->path);
         return new Ok($this->getId());
     }
 

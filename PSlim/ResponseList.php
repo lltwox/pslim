@@ -20,6 +20,17 @@ class ResponseList {
     private $responses = array();
 
     /**
+     * Constructor
+     *
+     * @param array $responses - list of responses to init list with
+     */
+    public function __construct(array $responses = array()) {
+        foreach ($responses as $response) {
+            $this->ad($response);
+        }
+    }
+
+    /**
      * Add response to the list
      *
      * @param Response $response
