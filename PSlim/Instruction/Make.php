@@ -104,7 +104,9 @@ class Make extends Instruction {
     private function createObject($className) {
         $reflectionClass = new \ReflectionClass($className);
         try {
-            $instance = $reflectionClass->newInstanceArgs($this->args);
+            $instance = $reflectionClass->newInstanceArgs(
+                $this->parseMethodArguments($this->args)
+            );
         } catch (\ReflectionException $e) {
             throw new CouldNotInvokeConstructor($this->className);
         }

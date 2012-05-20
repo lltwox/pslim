@@ -96,7 +96,9 @@ class Call extends Instruction {
     private function invokeMethod($object) {
         $reflectionMethod = $this->getReflectionMethod($object);
         try {
-            $result = $reflectionMethod->invokeArgs($object, $this->args);
+            $result = $reflectionMethod->invokeArgs(
+                $object, $this->parseMethodArguments($this->args)
+            );
         } catch (\ReflectionException $e) {
             throw new StandardException($e->getMessage());
         }

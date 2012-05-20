@@ -50,7 +50,7 @@ class CallAndAssign extends Call {
      */
     private function storeSymbolValue($value) {
         $storage = $this->getServiceLocator()->getSymbolStorage();
-        $storage->store($this->symbolName, $value);
+        $storage->store('$' . $this->symbolName, $value);
     }
 
 }

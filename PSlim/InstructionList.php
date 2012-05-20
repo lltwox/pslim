@@ -45,6 +45,7 @@ class InstructionList extends ServiceLocatorUser {
         $elements = $this->getArrayOfElements($input);
 
         foreach ($elements as $element) {
+            echo "Got instruction: " . json_encode($element) . "\n";
             $this->add(Instruction::create($element));
         }
     }

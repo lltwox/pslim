@@ -7,7 +7,7 @@ namespace PSlim;
  * @author lex
  *
  */
-abstract class Response {
+abstract class Response extends ServiceLocatorUser {
 
     /**
      * Id of the instruction, this response is for
@@ -32,7 +32,7 @@ abstract class Response {
      */
     public function getData() {
         $data = $this->getResponseData();
-//         echo "Response data: " . $data . "\n";
+        echo "Response data: " . $data . "\n";
         return array($this->id, $data);
     }
 

@@ -1,6 +1,8 @@
 <?php
 namespace PSlim\Service;
 
+use PSlim\Exception;
+
 use PSlim\ServiceLocatorUser;
 use PSlim\StandardException;
 
@@ -12,7 +14,7 @@ use PSlim\StandardException;
  * @author lex
  *
  */
-class InstanceStorage extends ServiceLocatorUser {
+class SymbolStorage extends ServiceLocatorUser {
 
     /**
      * Storage array
@@ -24,26 +26,12 @@ class InstanceStorage extends ServiceLocatorUser {
     /**
      * Store value under a name
      *
-     * @param string $key
+     * @param string $name
      * @param object $value
      */
     public function store($name, $value) {
+        $this->checkIsSymbolName($name);
         $this->storage[$name] = $value;
-    }
-
-    /**
-     * Get value, stored under a name
-     *
-     * @param string $name
-     * @throws NoInstance
-     * @return object
-     */
-    public function get($name) {
-        if (!isset($this->storage[$name])) {
-            throw new StandardException('No symbol found for name' . $name);
-        }
-
-        return $this->storage[$name];
     }
 
     /**
@@ -53,6 +41,89 @@ class InstanceStorage extends ServiceLocatorUser {
      */
     public function remove($name) {
         unset($this->storage[$name]);
+    }
+
+    /**
+     * Replace symbol in prvided string
+     *
+     * @param string $string
+     */
+    public function replaceSymbols($string) {
+        if ($this->isSymbol($string)) {
+            return $this->get($string);
+        } else {
+            return $this->replaceSymbolsInString($string);
+        }
+    }
+
+    /**
+     * Check if given string is a complete symbol name
+     *
+     * @param string $name
+     * @return boolean
+     */
+    private function isSymbol($name) {
+        return array_key_exists($name, $this->storage);
+    }
+
+    /**
+     * Get value for provided symbol name
+     *
+     * @param string $name
+     * @return mixed
+     */
+    private function get($name) {
+        $this->checkIsSymbolName($name);
+        if (!isset($this->storage[$name])) {
+            throw new StandardException('No symbol found for name' . $name);
+        }
+
+        return $this->storage[$name];
+    }
+
+    /**
+     * Replace all symbols in string
+     *
+     * @param string $string
+     * @return string
+     */
+    private function replaceSymbolsInString($string) {
+        return str_replace(
+            $this->getAllSymbols(),
+            $this->getAllSymbolsStringValues(),
+            $string
+        );
+    }
+
+    /**
+     * Get list of all registered symbol names
+     *
+     * @return array
+     */
+    private function getAllSymbols() {
+        return array_keys($this->storage);
+    }
+
+    /**
+     * Get string representation for all stored symbols values
+     *
+     * @return array
+     */
+    private function getAllSymbolsStringValues() {
+        // TODO: add convertion of symbol values
+        return $this->storage;
+    }
+
+    /**
+     * Prepend a dollar sign to a string to form a symbol name
+     *
+     * @param string $string
+     * @return string
+     */
+    private function checkIsSymbolName($name) {
+        if (mb_substr($name, 0, 1) !== '$') {
+            throw new StandardException('Invalid symbol name: ' . $name);
+        }
     }
 
 }

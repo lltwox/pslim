@@ -94,4 +94,20 @@ abstract class Instruction extends ServiceLocatorUser {
         return array_shift($input);
     }
 
+    /**
+     * Parse method arguments by applying symbols values, if needed.
+     *
+     * @param array $args
+     * @return array
+     */
+    protected function parseMethodArguments(array $args) {
+        $result = array();
+        $storage = $this->getServiceLocator()->getSymbolStorage();
+        foreach ($args as $arg) {
+            $result[] = $storage->replaceSymbols($arg);
+        }
+
+        return $result;
+    }
+
 }

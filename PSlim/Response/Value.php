@@ -34,7 +34,8 @@ class Value extends Response {
      * @return string
      */
     protected function getResponseData() {
-        return $this->value;
+        $converter = $this->getServiceLocator()->getTypeConverter();
+        return $converter->toString($this->value);
     }
 
 }

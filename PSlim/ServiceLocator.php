@@ -5,6 +5,8 @@ use PSlim\Exception;
 use PSlim\Service\PathRegistry;
 use PSlim\Service\NameParser;
 use PSlim\Service\InstanceStorage;
+use PSlim\Service\SymbolStorage;
+use PSlim\Service\TypeConverter;
 
 /**
  * Service locator pattern implementation.
@@ -51,6 +53,13 @@ class ServiceLocator {
     private $symbolStorage = null;
 
     /**
+     * Type converter object
+     *
+     * @var TypeConverter
+     */
+    private $typeConverter = null;
+
+    /**
      * Init instance of service locator.
      *
      * This ensures, that only one instance of service locator can be created
@@ -81,20 +90,10 @@ class ServiceLocator {
      */
     public function getPathRegistry() {
         if (null == $this->pathRegistry) {
-            $this->setPathRegistry(new PathRegistry());
+            $this->pathRegistry = new PathRegistry();
         }
 
         return $this->pathRegistry;
-    }
-
-    /**
-     * Set path registry object
-     *
-     * @param PathRegistry $registry
-     */
-    public function setPathRegistry(PathRegistry $registry) {
-        $this->pathRegistry = $registry;
-        $this->pathRegistry->setServiceLocator($this);
     }
 
     /**
@@ -136,15 +135,6 @@ class ServiceLocator {
     }
 
     /**
-     * Set instance storage object
-     *
-     * @param InstanceStorage $instanceStorage
-     */
-    public function setInstanceStorage(InstanceStorage $instanceStorage) {
-        $this->instanceStorage = $instanceStorage;
-    }
-
-    /**
      * Get symbol storage object, that can store named values.
      * Used for storing values, created with callAndAssign instruction.
      *
@@ -159,12 +149,17 @@ class ServiceLocator {
     }
 
     /**
-     * Set symbol storage object
+     * Get type converter object, that can convert strings to object of some
+     * type or from object to string
      *
-     * @param SymbolStorage $symbolStorage
+     * @return TypeConverter
      */
-    public function setSymbolStorage(SymbolStorage $symbolStorage) {
-        $this->symbolStorage = $symbolStorage;
+    public function getTypeConverter() {
+        if (null == $this->typeConverter) {
+            $this->typeConverter = new TypeConverter();
+        }
+
+        return $this->typeConverter;
     }
 
 }
