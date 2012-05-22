@@ -58,16 +58,29 @@ class Server {
         $result = array(
             'port' => 0,
             'bootstrap' => '',
+            'fixture-path' => '',
         );
 
         $args = $_SERVER['argv'];
         $count = $_SERVER['argc'];
-        if ($count > 2) {
-            if ($args[1] == '-b' || $args[1] == '--bootstrap') {
-                $result['bootstrap'] = $args[2];
+        // first one is script name, last one is port number, so
+        // we are skipping them
+        for ($i = 1; $i < $count - 1; $i++) {
+            switch ($args[$i]) {
+                case '-b':
+                case '--bootstrap':
+                    $i++;
+                    $result['bootstrap'] = $args[$i];
+                    break;
+                case '-p':
+                case '--fixture-path':
+                    $i++;
+                    $result['fixture-path'] = $args[$i];
+                    break;
+                default:
+                    throw new Exception();
             }
         }
-
         $result['port'] = array_pop($args);
 
         return $result;
@@ -88,7 +101,7 @@ class Server {
      */
     private function start($args) {
         $this->bootstrap($args['bootstrap']);
-        $this->initResources();
+        $this->initResources($args);
         $this->initSocket($args['port']);
 
         $this->greet();
@@ -115,10 +128,29 @@ class Server {
     /**
      * Init server resources
      *
+     * @param array $args command line arguments
      */
-    private function initResources() {
-        ServiceLocator::initInstance();
-        mb_internal_encoding("UTF-8");
+    private function initResources(array $args) {
+        mb_internal_encoding('UTF-8');
+        $serviceLocator = ServiceLocator::initInstance();
+        if (!empty($args['fixture-path'])) {
+            $this->addToIncludePath($args['fixture-path']);
+            $serviceLocator->getAliasRegistry()
+                ->setFixturePath($args['fixture-path'])
+            ;
+        }
+    }
+
+    /**
+     * Add provided path to include path
+     *
+     * @param string $path
+     */
+    private function addToIncludePath($path) {
+        set_include_path(
+            $path
+            . PATH_SEPARATOR . get_include_path()
+        );
     }
 
     /**

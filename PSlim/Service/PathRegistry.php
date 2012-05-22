@@ -40,14 +40,16 @@ class PathRegistry extends ServiceLocatorUser {
     public function getClassNamesFor($className) {
         $result = array();
         $nameParser = $this->getServiceLocator()->getNameParser();
+        $aliasRegistry = $this->getServiceLocator()->getAliasRegistry();
         $paths = $this->paths;
 
         $result[] = $nameParser->parse($className);
         foreach ($paths as $path) {
-            $result[]
+            $fullName
                 = $path . $nameParser->getImplodeSymbol()
                 . $nameParser->parse($className)
             ;
+            $result[] = $aliasRegistry->replaceClassNameWithAlias($fullName);
         }
 
         return $result;

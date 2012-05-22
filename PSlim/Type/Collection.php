@@ -21,6 +21,14 @@ class Collection implements Converter {
             throw new Exception('Not an array');
         }
 
+        // elements of the array should also be convertable to string
+        foreach ($object as $key => $item) {
+            // case of the object, that cannot be converted to string
+            if (is_object($item) && !method_exists($item, '__toString')) {
+                $object[$key] = 'Object';
+            }
+        }
+
         return '[' . implode(', ', $object) . ']';
     }
 

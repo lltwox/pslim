@@ -46,7 +46,7 @@ class SymbolStorage extends ServiceLocatorUser {
     /**
      * Replace symbol in prvided string
      *
-     * @param string $string
+     * @param mixed $string
      */
     public function replaceSymbols($string) {
         if ($this->isSymbol($string)) {
@@ -62,7 +62,7 @@ class SymbolStorage extends ServiceLocatorUser {
      * @param string $name
      * @return boolean
      */
-    private function isSymbol($name) {
+    public function isSymbol($name) {
         return array_key_exists($name, $this->storage);
     }
 
@@ -72,10 +72,9 @@ class SymbolStorage extends ServiceLocatorUser {
      * @param string $name
      * @return mixed
      */
-    private function get($name) {
-        $this->checkIsSymbolName($name);
+    public function get($name) {
         if (!isset($this->storage[$name])) {
-            throw new StandardException('No symbol found for name' . $name);
+            throw new StandardException('No symbol found for name ' . $name);
         }
 
         return $this->storage[$name];
@@ -110,8 +109,13 @@ class SymbolStorage extends ServiceLocatorUser {
      * @return array
      */
     private function getAllSymbolsStringValues() {
-        // TODO: add convertion of symbol values
-        return $this->storage;
+        $result = array();
+        $converter = $this->getServiceLocator()->getTypeConverter();
+        foreach ($this->storage as $object) {
+            $result = $converter->toString($object);
+        }
+
+        return $result;
     }
 
     /**

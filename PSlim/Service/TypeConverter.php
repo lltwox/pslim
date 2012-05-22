@@ -50,14 +50,19 @@ class TypeConverter extends ServiceLocatorUser {
         /* @var $converter Type\Converter */
         foreach ($this->converters as $converter) {
             try {
-                echo "Trying " . get_class($converter) . ":\n";
                 return $converter->toString($object);
             } catch (Type\Exception $e) {
                 // just continuing to next converter avalable
             }
         }
 
-        // no converters found, let php try to do something
+        // no converters found, handling special case when
+        // object cannot be converted to string
+        if (is_object($object) && !method_exists($object, '__toString')) {
+            return 'Object';
+        }
+
+        // otherwise, let's just show what it is
         return $object;
     }
 

@@ -103,8 +103,10 @@ abstract class Instruction extends ServiceLocatorUser {
     protected function parseMethodArguments(array $args) {
         $result = array();
         $storage = $this->getServiceLocator()->getSymbolStorage();
+        $converter = $this->getServiceLocator()->getTypeConverter();
         foreach ($args as $arg) {
-            $result[] = $storage->replaceSymbols($arg);
+            $string = $storage->replaceSymbols($arg);
+            $result[] = $converter->fromString($string);
         }
 
         return $result;

@@ -18,7 +18,7 @@ class InstanceStorage extends ServiceLocatorUser {
      *
      * @var array
      */
-    public $storage = array();
+    protected $storage = array();
 
     /**
      * Store instance under a name

@@ -19,9 +19,23 @@ class GracefulNames extends NameParser {
      */
     public function parse($name) {
         $parts = explode(' ', $name);
-        $parts = array_map('ucfirst', $parts);
+        $parts = array_map(array($this, 'ucfirst'), $parts);
 
         return implode($this->implodeSymbol, $parts);
+    }
+
+    /**
+     * Multibyte ucfirst
+     *
+     * @param string $string
+     * @return string
+     */
+    private function ucfirst($string) {
+        return
+            mb_strtoupper(
+                mb_substr($string, 0, 1, 'UTF-8'), 'UTF-8'
+            ) . mb_substr($string, 1, mb_strlen($string), 'UTF-8')
+        ;
     }
 
 }

@@ -57,10 +57,7 @@ class Make extends Instruction {
      */
     public function execute() {
         $this->removeStoredInstance();
-
-        $className = $this->getFullyQualifiedClassName();
-        $object = $this->createObject($className);
-        $this->storeObject($object);
+        $this->addInstance();
 
         return new Ok($this->getId());
     }
@@ -73,26 +70,51 @@ class Make extends Instruction {
      * previous table.
      */
     private function removeStoredInstance() {
-        $storage = $this->getServiceLocator()->getInstanceStorage();
+        if ($this->isLibraryInstance()) {
+            $storage = $this->getServiceLocator()->getLibraryStorage();
+        } else {
+            $storage = $this->getServiceLocator()->getInstanceStorage();
+        }
         $storage->remove($this->instanceName);
+    }
+
+    /**
+     * Add instance to appropriate storage.
+     *
+     */
+    private function addInstance() {
+        $symbolStorage = $this->getServiceLocator()->getSymbolStorage();
+        if ($symbolStorage->isSymbol($this->className)) {
+            $this->storeObject($symbolStorage->get($this->className));
+        } else {
+            $translatedClassName = $symbolStorage->replaceSymbols(
+                $this->className
+            );
+            $fullClassName = $this->getFullyQualifiedClassName(
+                $translatedClassName
+            );
+            $object = $this->createObject($fullClassName);
+            $this->storeObject($object);
+        }
     }
 
     /**
      * Get fully qualified class name by prepending all imported paths.
      *
+     * @param string $className
      * @return string
      */
-    private function getFullyQualifiedClassName() {
+    private function getFullyQualifiedClassName($className) {
         $pathRegisry = $this->getServiceLocator()->getPathRegistry();
-        $classNames = $pathRegisry->getClassNamesFor($this->className);
+        $fullClassNames = $pathRegisry->getClassNamesFor($className);
 
-        foreach ($classNames as $className) {
-            if (class_exists($className)) {
-                return $className;
+        foreach ($fullClassNames as $fullClassName) {
+            if (class_exists($fullClassName)) {
+                return $fullClassName;
             }
         }
 
-        throw new NoClass($this->className);
+        throw new NoClass($className);
     }
 
     /**
@@ -120,8 +142,24 @@ class Make extends Instruction {
      * @param object $instance
      */
     private function storeObject($object) {
-        $storage = $this->getServiceLocator()->getInstanceStorage();
+        if ($this->isLibraryInstance()) {
+            $storage = $this->getServiceLocator()->getLibraryStorage();
+        } else {
+            $storage = $this->getServiceLocator()->getInstanceStorage();
+        }
         $storage->store($this->instanceName, $object);
+    }
+
+    /**
+     * Check if object should be stored in library instance
+     *
+     * @return boolean
+     */
+    private function isLibraryInstance() {
+        return
+            mb_substr($this->instanceName, 0, mb_strlen('library'))
+            == 'library'
+        ;
     }
 
 }

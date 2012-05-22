@@ -22,7 +22,7 @@ class Nothing implements Converter {
             throw new Exception('Not a null');
         }
 
-        return 'null';
+        return '/__VOID__/';
     }
 
     /**

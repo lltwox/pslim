@@ -4,9 +4,12 @@ namespace PSlim;
 use PSlim\Exception;
 use PSlim\Service\PathRegistry;
 use PSlim\Service\NameParser;
+use PSlim\Service\AliasRegistry;
 use PSlim\Service\InstanceStorage;
+use PSlim\Service\LibraryStorage;
 use PSlim\Service\SymbolStorage;
 use PSlim\Service\TypeConverter;
+use PSlim\Service\InvocationChain;
 
 /**
  * Service locator pattern implementation.
@@ -39,11 +42,25 @@ class ServiceLocator {
     private $nameParser = null;
 
     /**
+     * Instance of alias registry
+     *
+     * @var AliasRegistry
+     */
+    private $aliasRegistry = null;
+
+    /**
      * Storage, for instances, created with make instruction
      *
      * @var InstanceStorage
      */
     private $instanceStorage = null;
+
+    /**
+     * Storage, for special library objects, created with make instruction
+     *
+     * @var LibraryStorage
+     */
+    private $libraryStorage = null;
 
     /**
      * Storage, for symbol values, created with callAndAssign instruction
@@ -60,10 +77,19 @@ class ServiceLocator {
     private $typeConverter = null;
 
     /**
+     * Invokation chain object
+     *
+     * @var InvocationChain
+     */
+    private $invocationChain = null;
+
+    /**
      * Init instance of service locator.
      *
      * This ensures, that only one instance of service locator can be created
      * and it will be created by PSlim in the begging.
+     *
+     * @return ServiceLocator
      */
     public static function initInstance() {
         if (null !== self::$instance) {
@@ -74,6 +100,8 @@ class ServiceLocator {
 
         self::$instance = new ServiceLocator();
         ServiceLocatorUser::setServiceLocator(self::$instance);
+
+        return self::$instance;
     }
 
     /**
@@ -121,6 +149,20 @@ class ServiceLocator {
     }
 
     /**
+     * Get alias registry object, that contains map from translted names to
+     * original ones.
+     *
+     * @return AliasRegistry
+     */
+    public function getAliasRegistry() {
+        if (null == $this->aliasRegistry) {
+            $this->aliasRegistry = new AliasRegistry();
+        }
+
+        return $this->aliasRegistry;
+    }
+
+    /**
      * Get instance storage object, that can store named objects.
      * Used for storing objects, created with make instruction.
      *
@@ -132,6 +174,20 @@ class ServiceLocator {
         }
 
         return $this->instanceStorage;
+    }
+
+    /**
+     * Get library storage object, that can store named objects.
+     * Used for storing special library objects.
+     *
+     * @return InstanceStorage
+     */
+    public function getLibraryStorage() {
+        if (null == $this->libraryStorage) {
+            $this->libraryStorage = new LibraryStorage();
+        }
+
+        return $this->libraryStorage;
     }
 
     /**
@@ -160,6 +216,20 @@ class ServiceLocator {
         }
 
         return $this->typeConverter;
+    }
+
+    /**
+     * Get invocation chain object, that can invoke given method on all
+     * available objects (fixture, sut, library)
+     *
+     * @return InvocationChain
+     */
+    public function getInvocationChain() {
+        if (null == $this->invocationChain) {
+            $this->invocationChain = new InvocationChain();
+        }
+
+        return $this->invocationChain;
     }
 
 }
