@@ -9,7 +9,6 @@ use PSlim\Service\InstanceStorage;
 use PSlim\Service\LibraryStorage;
 use PSlim\Service\SymbolStorage;
 use PSlim\Service\TypeConverter;
-use PSlim\Service\InvocationChain;
 
 /**
  * Service locator pattern implementation.
@@ -75,13 +74,6 @@ class ServiceLocator {
      * @var TypeConverter
      */
     private $typeConverter = null;
-
-    /**
-     * Invokation chain object
-     *
-     * @var InvocationChain
-     */
-    private $invocationChain = null;
 
     /**
      * Init instance of service locator.
@@ -216,20 +208,6 @@ class ServiceLocator {
         }
 
         return $this->typeConverter;
-    }
-
-    /**
-     * Get invocation chain object, that can invoke given method on all
-     * available objects (fixture, sut, library)
-     *
-     * @return InvocationChain
-     */
-    public function getInvocationChain() {
-        if (null == $this->invocationChain) {
-            $this->invocationChain = new InvocationChain();
-        }
-
-        return $this->invocationChain;
     }
 
 }

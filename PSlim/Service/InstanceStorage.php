@@ -38,7 +38,7 @@ class InstanceStorage extends ServiceLocatorUser {
      * @return object
      */
     public function get($name) {
-        if (!isset($this->storage[$name])) {
+        if (!$this->has($name)) {
             throw new NoInstance($name);
         }
 
@@ -52,6 +52,16 @@ class InstanceStorage extends ServiceLocatorUser {
      */
     public function remove($name) {
         unset($this->storage[$name]);
+    }
+
+    /**
+     * Check if instance with provided name exists
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function has($name) {
+        return isset($this->storage[$name]);
     }
 
 }
