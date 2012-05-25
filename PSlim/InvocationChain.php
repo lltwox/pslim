@@ -102,6 +102,19 @@ class InvocationChain extends ServiceLocatorUser {
         $this->throwException();
     }
 
+    private function invokeOnFixture() {
+        $object = $this->getObject();
+        $method = $this->aliasRegistry->replaceMethodNameWithAlias(
+            get_class($object), $this->method
+        );
+
+        if (!$this->isCallable($object, $method)) {
+            return false;
+        }
+
+//         $this->invocationResult =
+    }
+
     /**
      * Check if instance exists
      *
