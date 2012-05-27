@@ -3,6 +3,8 @@ namespace PSlim;
 
 use PSlim\Service\AliasRegistry;
 use PSlim\Service\InstanceStorage;
+use PSlim\Service\SutRegistry;
+use PSlim\Service\LibraryStorage;
 use PSlim\StandardException\NoInstance;
 use PSlim\StandardException\NoMethodInClass;
 
@@ -50,11 +52,32 @@ class InvocationChain extends ServiceLocatorUser {
     private $aliasRegistry = null;
 
     /**
+     * Link to sut registty object
+     *
+     * @var SutRegistry
+     */
+    private $sutRegistry = null;
+
+    /**
+     * Link to library storage object
+     *
+     * @var LibraryStorage
+     */
+    private $libraryStorage = null;
+
+    /**
      * Fixture object
      *
      * @var object
      */
     private $object = null;
+
+    /**
+     * Invocation result
+     *
+     * @var mixed
+     */
+    private $invocationResult = null;
 
     /**
      * Constructor
@@ -71,6 +94,8 @@ class InvocationChain extends ServiceLocatorUser {
         $serviceLocator = $this->getServiceLocator();
         $this->instanceStorage = $serviceLocator->getInstanceStorage();
         $this->aliasRegistry = $serviceLocator->getAliasRegistry();
+        $this->sutRegistry = $serviceLocator->getSutRegistry();
+        $this->libraryStorage = $serviceLocator->getLibraryStorage();
     }
 
     /**
@@ -102,17 +127,79 @@ class InvocationChain extends ServiceLocatorUser {
         $this->throwException();
     }
 
+    /**
+     * Try to invoke method in fixture object
+     *
+     * @return boolean
+     */
     private function invokeOnFixture() {
         $object = $this->getObject();
         $method = $this->aliasRegistry->replaceMethodNameWithAlias(
             get_class($object), $this->method
         );
 
-        if (!$this->isCallable($object, $method)) {
+        return $this->invokeMethodOnObject($method, $object);
+    }
+
+    /**
+     * Try to invokce method in system under test object
+     *
+     * @return boolean
+     */
+    private function invokeOnSut() {
+        $sut = $this->sutRegistry->get($this->getObject());
+        if (null == $sut || !is_object($sut)) {
             return false;
         }
 
-//         $this->invocationResult =
+        return $this->invokeMethodOnObject($this->method, $sut);
+    }
+
+    /**
+     * Try to invoke on every library object
+     *
+     * @return boolean
+     */
+    private function invokeOnLibrary() {
+        $objects = $this->libraryStorage->getObjects();
+        foreach ($objects as $object) {
+            $method = $this->aliasRegistry->replaceMethodNameWithAlias(
+                get_class($object), $this->method
+            );
+            $result = $this->invokeMethodOnObject($method, $object);
+            if ($result) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Throw an error exception
+     *
+     */
+    private function throwException() {
+        if (!$this->instanceStorage->has($this->instanceName)) {
+            throw new NoInstance($this->instanceName);
+        }
+
+        if (!is_object($this->getObject())) {
+            throw new NoMethodInClass($this->method . ' ' . $this->getObject());
+        }
+
+        throw new NoMethodInClass(
+            $this->method . ' ' . get_class($this->getObject())
+        );
+    }
+
+    /**
+     * Get result of invocation, filled by one of invokeOn* methods
+     *
+     * @return mixed
+     */
+    private function getInvocationResult() {
+        return $this->invocationResult;
     }
 
     /**
@@ -122,7 +209,7 @@ class InvocationChain extends ServiceLocatorUser {
      */
     private function instanceExists() {
         return
-            $this->instanceStorage->hasInstance()
+            $this->instanceStorage->has($this->instanceName)
             && is_object($this->getObject())
         ;
     }
@@ -138,6 +225,23 @@ class InvocationChain extends ServiceLocatorUser {
         }
 
         return $this->object;
+    }
+
+    /**
+     * Invoke method on given object and save result
+     *
+     * @param string $method
+     * @param object $object
+     * @return boolean
+     */
+    private function invokeMethodOnObject($method, $object) {
+        $callback = array($object, $method);
+        if (!is_callable($callback)) {
+            return false;
+        }
+        $this->invocationResult = call_user_func_array($callback, $this->args);
+
+        return true;
     }
 
 }

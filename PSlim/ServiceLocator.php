@@ -9,6 +9,7 @@ use PSlim\Service\InstanceStorage;
 use PSlim\Service\LibraryStorage;
 use PSlim\Service\SymbolStorage;
 use PSlim\Service\TypeConverter;
+use PSlim\Service\SutRegistry;
 
 /**
  * Service locator pattern implementation.
@@ -74,6 +75,13 @@ class ServiceLocator {
      * @var TypeConverter
      */
     private $typeConverter = null;
+
+    /**
+     * Sut registry object
+     *
+     * @var SutRegistry
+     */
+    private $sutRegistry = null;
 
     /**
      * Init instance of service locator.
@@ -208,6 +216,19 @@ class ServiceLocator {
         }
 
         return $this->typeConverter;
+    }
+
+    /**
+     * Get sut registry object, that can retrieve sut objects from fixtures.
+     *
+     * @return SutStorage
+     */
+    public function getSutRegistry() {
+        if (null == $this->sutRegistry) {
+            $this->sutRegistry = new SutRegistry();
+        }
+
+        return $this->sutRegistry;
     }
 
 }

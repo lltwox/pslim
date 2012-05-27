@@ -4,7 +4,7 @@ namespace PSlim\Service\AliasRegistry;
 use PSlim\Exception;
 
 /**
- * Alias loader. Parses files with fixtures and loads specified aliases
+ * Class alias loader. Parses files with fixtures and loads specified aliases
  * for classes.
  *
  * @author lex

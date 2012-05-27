@@ -92,6 +92,11 @@ class Decoder {
         return (
             mb_substr($input, 0, 1) === '['
             && mb_substr($input, -1) === ']'
+            && mb_substr(
+                $input,
+                1 + self::LENGTH_DIGITS,
+                self::DELIMITER_LENGTH
+            ) === ':'
         );
     }
 

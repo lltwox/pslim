@@ -1,6 +1,8 @@
 <?php
 namespace PSlim\Instruction;
 
+use PSlim\InvocationChain;
+
 use PSlim\Instruction;
 use PSlim\Response\Value;
 use PSlim\StandardException;
@@ -55,13 +57,22 @@ class Call extends Instruction {
      * @return Response
      */
     public function execute() {
-        $chain = $this->getServiceLocator()->getInvocationChain();
-        $result = $chain->invoke(
+        $result = $this->callMethod();
+        return new Value($this->getId(), $result);
+    }
+
+    /**
+     * Call specified method
+     *
+     * @return mixed
+     */
+    protected function callMethod() {
+        $chain = new InvocationChain(
             $this->instanceName, $this->method,
             $this->parseMethodArguments($this->args)
         );
 
-        return new Value($this->getId(), $result);
+        return $chain->invoke();
     }
 
 }
