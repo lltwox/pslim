@@ -31,7 +31,7 @@ class Server {
      * Run server
      *
      */
-    public function run() {
+    public static function run() {
         try {
             $args = self::processInputArgs();
         } catch (Exception $e) {
@@ -63,8 +63,10 @@ class Server {
 
         $args = $_SERVER['argv'];
         $count = $_SERVER['argc'];
-        // first one is script name, last one is port number, so
-        // we are skipping them
+        // first one is script name, last one is port number
+        if ($count < 2) {
+            throw new Exception();
+        }
         for ($i = 1; $i < $count - 1; $i++) {
             switch ($args[$i]) {
                 case '-b':
@@ -87,7 +89,7 @@ class Server {
     }
 
     /**
-     * Private construcot to enforce use of run() method
+     * Private constructor to enforce use of run() method
      *
      */
     private function __construct() {
@@ -223,7 +225,12 @@ class Server {
      *
      */
     private static function printHelp() {
-        echo 'Help';
+        echo
+            'Usage: php pslim.php'
+            . ' [-b <bootstrap file>]'
+            . ' [-p <fixture path>] <port>'
+            . "\n"
+        ;
     }
 
 }

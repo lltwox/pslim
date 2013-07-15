@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * Runner for php slim server

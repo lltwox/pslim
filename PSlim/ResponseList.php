@@ -26,7 +26,7 @@ class ResponseList {
      */
     public function __construct(array $responses = array()) {
         foreach ($responses as $response) {
-            $this->ad($response);
+            $this->add($response);
         }
     }
 
