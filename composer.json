@@ -1,0 +1,20 @@
+{
+    "name": "pslim/pslim",
+    "type": "library",
+    "description": "PHP implementation of the Slim Protocol for FitNesse testing framework",
+    "keywords": ["fitnesse", "slim", "acceptance testing"],
+    "homepage": "https://github.com/lltwox/pslim",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Golubev",
+            "email": "lltwox@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "autoload": {
+        "psr-0": {"PHPAnt": "lib/"}
+    }
+}
