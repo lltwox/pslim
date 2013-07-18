@@ -40,11 +40,20 @@ class ResponseList {
     }
 
     /**
+     * Get repsentation of the responses as a string
+     *
+     * @return string
+     */
+    public function __toString() {
+        return $this->encode();
+    }
+
+    /**
      * Encode list of responses in string length encoding
      *
      * @return string
      */
-    public function encode() {
+    private function encode() {
         $encoder = new Encoder();
         return $encoder->encode($this->responses);
     }

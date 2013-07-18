@@ -73,6 +73,10 @@ class TypeConverter extends ServiceLocatorUser {
      * @return mixed
      */
     public function fromString($string) {
+        // object beeing converted can be array or object from symbol storage
+        if (!is_string($string)) {
+            return $string;
+        }
         /* @var $converter Type\Converter */
         foreach ($this->converters as $converter) {
             try {

@@ -34,8 +34,8 @@ abstract class Instruction extends ServiceLocatorUser {
      *        used by instructions
      */
     public static function create(array $params) {
-        $id = self::extractFirstParam($params);
-        $type = self::extractFirstParam($params);
+        $id = self::extractParam($params);
+        $type = self::extractParam($params);
 
         $classname = self::getInstructionClassname($type);
 
@@ -86,7 +86,7 @@ abstract class Instruction extends ServiceLocatorUser {
      * @param array &$input - array will be modified the same if array_shift is
      *        called on it
      */
-    protected static function extractFirstParam(array &$input) {
+    protected static function extractParam(array &$input) {
         if (empty($input)) {
             throw new StandardException\MalformedInstruction();
         }

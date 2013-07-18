@@ -49,6 +49,10 @@ class SymbolStorage extends ServiceLocatorUser {
      * @param mixed $string
      */
     public function replaceSymbols($string) {
+        if (!is_string($string)) {
+            return $string;
+        }
+
         if ($this->isSymbol($string)) {
             return $this->get($string);
         } else {

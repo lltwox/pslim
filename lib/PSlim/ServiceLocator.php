@@ -4,7 +4,6 @@ namespace PSlim;
 use PSlim\Exception;
 use PSlim\Service\PathRegistry;
 use PSlim\Service\NameParser;
-use PSlim\Service\AliasRegistry;
 use PSlim\Service\InstanceStorage;
 use PSlim\Service\LibraryStorage;
 use PSlim\Service\SymbolStorage;
@@ -40,13 +39,6 @@ class ServiceLocator {
      * @var NameParser
      */
     private $nameParser = null;
-
-    /**
-     * Instance of alias registry
-     *
-     * @var AliasRegistry
-     */
-    private $aliasRegistry = null;
 
     /**
      * Storage, for instances, created with make instruction
@@ -146,20 +138,6 @@ class ServiceLocator {
      */
     public function setNameParser(NameParser $nameParser) {
         $this->nameParser = $nameParser;
-    }
-
-    /**
-     * Get alias registry object, that contains map from translted names to
-     * original ones.
-     *
-     * @return AliasRegistry
-     */
-    public function getAliasRegistry() {
-        if (null == $this->aliasRegistry) {
-            $this->aliasRegistry = new AliasRegistry();
-        }
-
-        return $this->aliasRegistry;
     }
 
     /**

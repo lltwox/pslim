@@ -35,9 +35,12 @@ class Server {
         try {
             $args = self::processInputArgs();
         } catch (Exception $e) {
+            echo $e->getMessage() . "\n";
             self::printHelp();
             return;
         }
+
+        // self::enableErrorHandler();
 
         $server = new Server();
         try {
@@ -47,6 +50,8 @@ class Server {
             echo 'Stack trace: ' . "\n";
             echo $e->getTraceAsString();
         }
+
+        // self::restoreErrorHanlder();
     }
 
     /**
@@ -58,14 +63,13 @@ class Server {
         $result = array(
             'port' => 0,
             'bootstrap' => '',
-            'fixture-path' => '',
         );
 
         $args = $_SERVER['argv'];
         $count = $_SERVER['argc'];
         // first one is script name, last one is port number
         if ($count < 2) {
-            throw new Exception();
+            throw new Exception('Not enough arguments');
         }
         for ($i = 1; $i < $count - 1; $i++) {
             switch ($args[$i]) {
@@ -74,13 +78,10 @@ class Server {
                     $i++;
                     $result['bootstrap'] = $args[$i];
                     break;
-                case '-p':
-                case '--fixture-path':
-                    $i++;
-                    $result['fixture-path'] = $args[$i];
-                    break;
                 default:
-                    throw new Exception();
+                    throw new Exception(
+                        'Unknown command line option: ' . $args[$i]
+                    );
             }
         }
         $result['port'] = array_pop($args);
@@ -135,24 +136,6 @@ class Server {
     private function initResources(array $args) {
         mb_internal_encoding('UTF-8');
         $serviceLocator = ServiceLocator::initInstance();
-        if (!empty($args['fixture-path'])) {
-            $this->addToIncludePath($args['fixture-path']);
-            $serviceLocator->getAliasRegistry()
-                ->setFixturePath($args['fixture-path'])
-            ;
-        }
-    }
-
-    /**
-     * Add provided path to include path
-     *
-     * @param string $path
-     */
-    private function addToIncludePath($path) {
-        set_include_path(
-            $path
-            . PATH_SEPARATOR . get_include_path()
-        );
     }
 
     /**
@@ -163,6 +146,14 @@ class Server {
     private function initSocket($port) {
         $this->socket = new Socket();
         $this->socket->bind($port);
+    }
+
+    /**
+     * Print slim protocol version
+     *
+     */
+    private function greet() {
+        $this->socket->write('Slim -- V' . self::VERSION . "\n");
     }
 
     /**
@@ -179,17 +170,8 @@ class Server {
             $instructionsList = new InstructionList($input);
             $responseList = $instructionsList->execute();
 
-            $response = $responseList->encode();
-            $this->writeResponse($response);
+            $this->writeResponse($responseList->__toString());
         }
-    }
-
-    /**
-     * Print slim protocol version
-     *
-     */
-    private function greet() {
-        $this->socket->write('Slim -- V' . self::VERSION . "\n");
     }
 
     /**
@@ -221,6 +203,22 @@ class Server {
     }
 
     /**
+     * Enable error hanlder for pslim internal errors
+     *
+     */
+    private static function enableErrorHandler() {
+
+    }
+
+    /**
+     * Restore error handler, that was set up before pslim server start
+     *
+     */
+    private static function restoreErrorHanlder() {
+        restore_error_handler();
+    }
+
+    /**
      * Print help message
      *
      */
@@ -228,7 +226,6 @@ class Server {
         echo
             'Usage: php pslim.php'
             . ' [-b <bootstrap file>]'
-            . ' [-p <fixture path>] <port>'
             . "\n"
         ;
     }

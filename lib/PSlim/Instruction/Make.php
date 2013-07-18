@@ -45,8 +45,8 @@ class Make extends Instruction {
     public function __construct($id, $params) {
         parent::__construct($id);
 
-        $this->instanceName = self::extractFirstParam($params);
-        $this->className = self::extractFirstParam($params);
+        $this->instanceName = self::extractParam($params);
+        $this->className = self::extractParam($params);
         $this->args = $params;
     }
 

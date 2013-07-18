@@ -46,8 +46,8 @@ class Call extends Instruction {
     public function __construct($id, $params) {
         parent::__construct($id);
 
-        $this->instanceName = self::extractFirstParam($params);
-        $this->method = self::extractFirstParam($params);
+        $this->instanceName = self::extractParam($params);
+        $this->method = self::extractParam($params);
         $this->args = $params;
     }
 

@@ -28,7 +28,7 @@ class Import extends Instruction {
      */
     public function __construct($id, array $params) {
         parent::__construct($id);
-        $this->path = self::extractFirstParam($params);
+        $this->path = self::extractParam($params);
     }
 
     /**

@@ -26,7 +26,7 @@ class CallAndAssign extends Call {
      * @param array $params
      */
     public function __construct($id, $params) {
-        $this->symbolName = self::extractFirstParam($params);
+        $this->symbolName = self::extractParam($params);
         parent::__construct($id, $params);
     }
 
@@ -39,7 +39,6 @@ class CallAndAssign extends Call {
         $result = $this->callMethod();
         $this->storeSymbolValue($result);
 
-        // TODO: convert value to string
         return new Value($this->getId(), $result);
     }
 

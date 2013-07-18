@@ -139,7 +139,7 @@ class Socket {
     }
 
     /**
-     * Before reading any data, ensuring, we need to ensure, that there are
+     * Before reading any data, we need to ensure, that there are
      * data to read
      *
      */

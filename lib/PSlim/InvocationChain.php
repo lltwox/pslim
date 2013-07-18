@@ -1,7 +1,6 @@
 <?php
 namespace PSlim;
 
-use PSlim\Service\AliasRegistry;
 use PSlim\Service\InstanceStorage;
 use PSlim\Service\SutRegistry;
 use PSlim\Service\LibraryStorage;
@@ -45,13 +44,6 @@ class InvocationChain extends ServiceLocatorUser {
     private $instanceStorage = null;
 
     /**
-     * Link to alias registry object
-     *
-     * @var AliasRegistry
-     */
-    private $aliasRegistry = null;
-
-    /**
      * Link to sut registty object
      *
      * @var SutRegistry
@@ -93,7 +85,6 @@ class InvocationChain extends ServiceLocatorUser {
 
         $serviceLocator = $this->getServiceLocator();
         $this->instanceStorage = $serviceLocator->getInstanceStorage();
-        $this->aliasRegistry = $serviceLocator->getAliasRegistry();
         $this->sutRegistry = $serviceLocator->getSutRegistry();
         $this->libraryStorage = $serviceLocator->getLibraryStorage();
     }
@@ -134,11 +125,8 @@ class InvocationChain extends ServiceLocatorUser {
      */
     private function invokeOnFixture() {
         $object = $this->getObject();
-        $method = $this->aliasRegistry->replaceMethodNameWithAlias(
-            get_class($object), $this->method
-        );
 
-        return $this->invokeMethodOnObject($method, $object);
+        return $this->invokeMethodOnObject($this->method, $object);
     }
 
     /**
@@ -163,10 +151,7 @@ class InvocationChain extends ServiceLocatorUser {
     private function invokeOnLibrary() {
         $objects = $this->libraryStorage->getObjects();
         foreach ($objects as $object) {
-            $method = $this->aliasRegistry->replaceMethodNameWithAlias(
-                get_class($object), $this->method
-            );
-            $result = $this->invokeMethodOnObject($method, $object);
+            $result = $this->invokeMethodOnObject($this->method, $object);
             if ($result) {
                 return true;
             }

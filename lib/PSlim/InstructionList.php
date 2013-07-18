@@ -42,7 +42,7 @@ class InstructionList extends ServiceLocatorUser {
      * @param string $input - input from FitNesse, length encoded
      */
     public function __construct($input) {
-        $elements = $this->getArrayOfElements($input);
+        $elements = $this->decodeElements($input);
 
         foreach ($elements as $element) {
             $this->add(Instruction::create($element));
@@ -87,7 +87,7 @@ class InstructionList extends ServiceLocatorUser {
      * @param string $input
      * @return array
      */
-    private function getArrayOfElements($input) {
+    private function decodeElements($input) {
         $decoder = new Decoder();
         return $decoder->decode($input);
     }
